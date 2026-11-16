@@ -218,24 +218,39 @@ body {
 .player-list .naam { flex: 1; font-size: 1.1rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .player-list .btn { padding: 8px 14px; min-height: 44px; font-size: 0.9rem; }
 
-.setup-label { align-self: flex-start; max-width: 560px; width: 100%; margin: 4px 0 0; color: var(--tekst-dim); font-weight: 600; }
-.setup-list li { cursor: pointer; }
+.setup-label { align-self: flex-start; max-width: 720px; width: 100%; margin: 0; color: var(--tekst-dim); font-weight: 600; font-size: 0.9rem; }
+
+/* Setup-scherm compact, zodat 8 namen zonder scrollen passen */
+#screen-setup { gap: 5px; padding: 4px 12px; justify-content: flex-start; }
+#screen-setup .screen-title { font-size: 1.25rem; margin: 2px 0 0; }
+.setup-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  max-width: 720px;
+  max-height: none;
+  overflow-y: visible;
+}
+@media (min-width: 700px) {
+  .setup-list { grid-template-columns: repeat(3, 1fr); }
+}
+.setup-list li { cursor: pointer; min-height: 44px; padding: 4px 10px; gap: 8px; }
 .setup-list li .vink {
-  width: 30px; height: 30px;
+  width: 26px; height: 26px;
   border: 2px solid var(--tekst-dim);
-  border-radius: 8px;
+  border-radius: 7px;
   flex: none;
   display: flex; align-items: center; justify-content: center;
   font-weight: 800; color: transparent;
 }
 .setup-list li.geselecteerd { border-color: var(--accent); background: var(--bg-panel-2); }
 .setup-list li.geselecteerd .vink { background: var(--accent); border-color: var(--accent); color: #241703; }
-.setup-list .naam { flex: 1; font-size: 1.1rem; font-weight: 600; }
+.setup-list .naam { flex: 1; font-size: 1rem; font-weight: 600; }
 
-.order-choice { display: flex; gap: 16px; flex-wrap: wrap; }
-.radio-row { display: flex; align-items: center; gap: 8px; min-height: 48px; font-size: 1rem; cursor: pointer; }
-.radio-row input { width: 24px; height: 24px; accent-color: var(--accent); }
-.radio-hint { color: var(--tekst-dim); font-size: 0.85rem; }
+.order-choice { display: flex; gap: 12px; flex-wrap: wrap; }
+.radio-row { display: flex; align-items: center; gap: 8px; min-height: 40px; font-size: 0.95rem; cursor: pointer; }
+.radio-row input { width: 20px; height: 20px; accent-color: var(--accent); }
+.radio-hint { color: var(--tekst-dim); font-size: 0.8rem; }
 
 /* ---------- HUD ---------- */
 #hud[hidden] { display: none; }
@@ -280,6 +295,7 @@ body {
   justify-content: center;
   flex: none;
   perspective: 700px;
+  container-type: inline-size;
 }
 .tegel {
   position: relative;
@@ -304,6 +320,9 @@ body {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   font-size: clamp(1.3rem, 5.5vh, 2.2rem);
+  /* cijfers schalen exact mee met de tegelbreedte (9 tegels ≈ 10,4cqw per tegel) */
+  font-size: 4.7cqw;
+  line-height: 1;
   font-weight: 800;
 }
 .tegel .voorkant {
