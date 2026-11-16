@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#171008">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Shut the Box – Bakken trekken</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Melding bij portretstand -->
+  <div id="rotate-overlay" role="alert">
+    <div class="rotate-icon" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="72" height="72" fill="none" stroke="currentColor" stroke-width="3">
+        <rect x="14" y="8" width="28" height="48" rx="5"/>
+        <path d="M46 20a14 14 0 0 1 6 12" stroke-linecap="round"/>
+        <path d="M52 24v8h-8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <p>Draai je telefoon</p>
+    <p class="rotate-sub">Dit spel speel je in landschapsstand</p>
+  </div>
+
+  <div id="app">
+
+    <!-- Kopregel tijdens het spel -->
+    <header id="hud" hidden>
+      <button id="btn-home" class="hud-btn" aria-label="Naar hoofdmenu" title="Naar hoofdmenu">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      </button>
+      <div class="hud-item hud-player-wrap">Aan de beurt: <strong id="hud-player">–</strong></div>
+      <div class="hud-item">Shuts: <strong id="hud-shuts">0</strong></div>
+      <div class="hud-item">Bakken: <strong id="hud-baks">1</strong></div>
+      <button id="btn-undo" class="hud-btn hud-undo" disabled>Ongedaan maken</button>
+    </header>
+
+    <main id="screens">
+
+      <!-- 1. Hoofdmenu -->
+      <section id="screen-menu" class="screen menu-screen">
+        <h1 class="app-title">Shut the Box</h1>
+        <p class="app-subtitle">Wie verliest, trekt bakken</p>
+        <nav class="menu-buttons">
+          <button id="btn-continue" class="btn btn-primary" hidden>Doorgaan met potje</button>
+          <button id="btn-new" class="btn btn-primary">Nieuw potje</button>
+          <button id="btn-players" class="btn">Spelers</button>
+          <button id="btn-score" class="btn">Scorebord</button>
+          <button id="btn-rules" class="btn">Regels</button>
+        </nav>
+        <div class="settings">
+          <h2 class="settings-title">Instellingen</h2>
+          <label class="switch-row">
+            <span>Geluid</span>
+            <input type="checkbox" id="toggle-sound" class="switch" checked>
+          </label>
+          <label class="switch-row">
+            <span>Trillen</span>
+            <input type="checkbox" id="toggle-vibrate" class="switch" checked>
+          </label>
+        </div>
+      </section>
+
+      <!-- 2. Spelers beheren -->
+      <section id="screen-players" class="screen">
+        <h2 class="screen-title">Spelers</h2>
+        <form id="add-player-form" autocomplete="off">
+          <input type="text" id="player-name" maxlength="20" placeholder="Naam van speler" aria-label="Naam van speler">
+          <button type="submit" class="btn btn-primary" id="btn-add-player">Toevoegen</button>
+        </form>
+        <ul id="player-list" class="player-list"></ul>
+        <p id="players-empty" class="empty-note" hidden>Nog geen spelers. Voeg er minstens twee toe om te spelen.</p>
+        <button class="btn btn-back" data-go="menu">Terug naar menu</button>
+      </section>
+
+      <!-- 3. Potje opzetten -->
+      <section id="screen-setup" class="screen">
+        <h2 class="screen-title">Nieuw potje</h2>
+        <p class="setup-label">Wie doen er mee? (minimaal 2)</p>
+        <ul id="setup-player-list" class="setup-list"></ul>
+        <p class="setup-label">Volgorde</p>
+        <div class="order-choice" role="radiogroup" aria-label="Volgorde">
+          <label class="radio-row"><input type="radio" name="order-mode" value="fixed" checked> Vaste volgorde <span class="radio-hint">(volgorde van de lijst)</span></label>
+          <label class="radio-row"><input type="radio" name="order-mode" value="random"> Willekeurig</label>
+        </div>
+        <p id="setup-error" class="error-note" hidden>Kies minstens 2 spelers.</p>
+        <div class="row-buttons">
+          <button class="btn btn-back" data-go="menu">Terug</button>
+          <button id="btn-start-game" class="btn btn-primary">Start potje</button>
+        </div>
+      </section>
+
+      <!-- 4. Spel -->
+      <section id="screen-game" class="screen game-screen">
+        <div id="game-main">
+          <div id="tiles" aria-label="Tegels"></div>
+
+          <div id="game-lower">
+            <div id="dice-area" aria-label="Dobbelstenen">
+              <div id="die1" class="die" hidden></div>
+              <div id="die2" class="die" hidden></div>
+              <p id="dice-hint" class="dice-hint">Tik op Gooi om te gooien</p>
+              <p id="physics-hint" class="physics-hint" hidden>Sleep de 2e dobbelsteen tegen de eerste – of tik erop om te lanceren</p>
+            </div>
+
+            <div id="controls">
+              <p id="game-message" class="game-message" aria-live="polite"></p>
+
+              <div id="dice-choice" class="control-block" hidden>
+                <p id="dice-choice-text" class="choice-text"></p>
+                <div class="row-buttons">
+                  <button id="btn-one-die" class="btn btn-primary">1 dobbelsteen</button>
+                  <button id="btn-two-dice" class="btn btn-primary">2 dobbelstenen</button>
+                </div>
+              </div>
+
+              <button id="btn-roll" class="btn btn-primary btn-big">Gooi</button>
+              <button id="btn-close" class="btn btn-primary btn-big" disabled>Dicht!</button>
+
+              <div id="stuck-block" class="control-block" hidden>
+                <button id="btn-second-die" class="btn btn-warn btn-big" hidden>Gooi 2e dobbelsteen</button>
+                <button id="btn-end-turn" class="btn btn-primary btn-big">Beurt afronden</button>
+              </div>
+
+              <div id="shootout-block" class="control-block" hidden>
+                <p id="shootout-info" class="choice-text"></p>
+                <button id="btn-shootout-roll" class="btn btn-warn btn-big">Gooi beslisworp</button>
+                <ul id="shootout-rolls" class="shootout-rolls"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div id="turn-scores" class="turn-scores" aria-label="Beurten en restscores"></div>
+        </div>
+      </section>
+
+      <!-- 5. Einde potje -->
+      <section id="screen-end" class="screen end-screen">
+        <p class="end-label">De verliezer is</p>
+        <h2 id="end-loser" class="end-loser">–</h2>
+        <p id="end-baks" class="end-baks">–</p>
+        <div id="end-details" class="end-details"></div>
+        <div class="row-buttons">
+          <button id="btn-again" class="btn btn-primary">Nog een potje</button>
+          <button id="btn-to-menu" class="btn">Naar menu</button>
+        </div>
+      </section>
+
+      <!-- 6. Scorebord -->
+      <section id="screen-score" class="screen">
+        <h2 class="screen-title">Scorebord</h2>
+        <div class="table-wrap">
+          <table id="score-table">
+            <thead>
+              <tr>
+                <th data-sort="name" scope="col">Naam</th>
+                <th data-sort="played" scope="col">Potjes</th>
+                <th data-sort="lost" scope="col">Verloren</th>
+                <th data-sort="bak" scope="col">Bakken</th>
+              </tr>
+            </thead>
+            <tbody id="score-body"></tbody>
+          </table>
+        </div>
+        <p id="score-empty" class="empty-note" hidden>Nog geen scores. Speel eerst een potje.</p>
+        <div class="row-buttons">
+          <button class="btn btn-back" data-go="menu">Terug naar menu</button>
+          <button id="btn-reset-score" class="btn btn-danger">Scorebord resetten</button>
+        </div>
+      </section>
+
+      <!-- 7. Regels -->
+      <section id="screen-rules" class="screen rules-screen">
+        <h2 class="screen-title">Regels</h2>
+        <div class="rules-text">
+          <p><strong>Doel:</strong> sluit zoveel mogelijk tegels (1 t/m 9) en houd een zo laag mogelijke restscore over. Er is geen winnaar – alleen een verliezer, en die trekt bakken.</p>
+          <p><strong>Beurt:</strong> gooi met 2 dobbelstenen en sluit daarna 1 of 2 open tegels waarvan de som precies gelijk is aan je worp. Tik een tegel opnieuw aan om te deselecteren. Bevestig met "Dicht!". Daarna gooi je opnieuw. Maximaal 2 tegels per worp.</p>
+          <p><strong>Weinig op het bord:</strong> is de som van de open tegels 5 of lager, dan mag je vóór elke worp kiezen: gooien met 1 of met 2 dobbelstenen.</p>
+          <p><strong>Vast:</strong> kun je met je worp geen enkele combinatie van 1 of 2 open tegels maken, dan ben je vast. Combinaties van 3 tegels tellen niet. Je restscore is de som van de open tegels.</p>
+          <p><strong>Tweede kans:</strong> ben je vast na een worp met 1 dobbelsteen, dan mag je één keer de 2e dobbelsteen er tegenaan gooien: sleep hem richting de eerste (of tik erop). Bij een botsing veranderen beide dobbelstenen van waarde en speel je verder met de nieuwe som.</p>
+          <p><strong>Shut the Box:</strong> alle tegels dicht? Dan is je restscore 0 en gaat de shutteller omhoog. Elke shut telt.</p>
+          <p><strong>Verliezer:</strong> als iedereen één beurt heeft gehad, verliest de speler met de hoogste restscore. Bij gelijkspel volgt een beslisworp: de gelijkstaanden gooien elk met 1 dobbelsteen, de laagste verliest. Bij opnieuw gelijk laagste worp herhaal je met alleen die spelers.</p>
+          <p><strong>Bakken:</strong> de verliezer trekt 1 bak plus 1 extra per shut in het potje. Twee shuts = 3 bakken.</p>
+        </div>
+        <button class="btn btn-back" data-go="menu">Terug naar menu</button>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Shut-viering -->
+  <div id="shut-overlay" hidden>
+    <div class="shut-flash"></div>
+    <p class="shut-text">SHUT THE BOX!</p>
+    <button id="btn-shut-next" class="btn btn-primary btn-big">Verder</button>
+  </div>
+  <canvas id="confetti" hidden></canvas>
+
+  <!-- Algemene dialoog en toast -->
+  <div id="modal-backdrop" hidden>
+    <div id="modal" role="dialog" aria-modal="true">
+      <p id="modal-text"></p>
+      <input type="text" id="modal-input" maxlength="20" hidden>
+      <div id="modal-buttons" class="row-buttons"></div>
+    </div>
+  </div>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="game-logic.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
