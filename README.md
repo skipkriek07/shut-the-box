@@ -12,28 +12,6 @@ Een mobiele webapp (PWA) van het dobbelspel **Shut the Box**, bedoeld als dranks
 - Na alle beurten verliest de speler met de hoogste restscore. Bij gelijkspel volgt een beslisworp (laagste verliest, herhaal bij opnieuw gelijk).
 - De verliezer trekt **1 bak + 1 per shut** in het potje.
 
-## Publiceren op GitHub Pages
-
-1. **Repository maken**
-   - Ga naar [github.com](https://github.com) en log in.
-   - Klik rechtsboven op **+** → **New repository**.
-   - Geef een naam, bijvoorbeeld `shut-the-box`, kies **Public** en klik **Create repository**.
-
-2. **Bestanden uploaden**
-   - Klik op de pagina van je nieuwe repository op **uploading an existing file** (of **Add file** → **Upload files**).
-   - Sleep alle bestanden en mappen uit deze map erin (dus: `index.html`, `style.css`, `app.js`, `game-logic.js`, `sw.js`, `manifest.webmanifest`, de map `icons/` met de drie png's, en eventueel deze `README.md`).
-   - Klik onderaan op **Commit changes**.
-
-3. **GitHub Pages aanzetten**
-   - Ga in je repository naar **Settings** → links in het menu **Pages**.
-   - Kies bij **Build and deployment** → **Source**: **Deploy from a branch**.
-   - Kies bij **Branch**: **main** en map **/(root)**, klik **Save**.
-   - Na ongeveer een minuut staat de site live op:
-     `https://<jouw-gebruikersnaam>.github.io/shut-the-box/`
-     (de exacte link verschijnt ook bovenaan de Pages-instellingen).
-
-4. **Delen**
-   - Deel die link met je vrienden. Iedereen met de link kan de app openen en spelen; er is geen account of installatie nodig.
 
 ## Op het beginscherm zetten
 
