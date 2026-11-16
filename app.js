@@ -694,10 +694,52 @@
     toonScherm('end');
   }
 
+  var BIER_SVG =
+    '<svg viewBox="0 0 60 86" aria-hidden="true">' +
+      '<g class="glas-tilt">' +
+        '<path d="M44 34h7a7 7 0 0 1 7 7v12a7 7 0 0 1-7 7h-7" fill="none" stroke="#e9dcc2" stroke-width="4"/>' +
+        '<rect x="6" y="14" width="38" height="62" rx="6" fill="rgba(240,235,220,0.10)" stroke="#e9dcc2" stroke-width="3"/>' +
+        '<g class="vocht">' +
+          '<rect x="10" y="28" width="30" height="44" rx="3" fill="#e8a33d"/>' +
+          '<g class="schuim">' +
+            '<circle cx="16" cy="27" r="6" fill="#f8f4e8"/>' +
+            '<circle cx="25" cy="24" r="7" fill="#f8f4e8"/>' +
+            '<circle cx="34" cy="27" r="6" fill="#f8f4e8"/>' +
+            '<rect x="10" y="25" width="30" height="7" fill="#f8f4e8"/>' +
+          '</g>' +
+        '</g>' +
+      '</g>' +
+    '</svg>';
+
   function renderEinde() {
     if (!game) { toonScherm('menu'); return; }
     $('#end-loser').textContent = spelerNaam(game.loserId);
     $('#end-baks').textContent = 'moet ' + L.bakTekst(game.bakken) + ' trekken';
+
+    // biertjes: 1 per bak, ze schenken een voor een leeg over de naam
+    var bieren = $('#end-bieren');
+    var spetters = $('#end-spetters');
+    bieren.innerHTML = '';
+    spetters.innerHTML = '';
+    bieren.style.setProperty('--n', game.bakken);
+    for (var i = 0; i < game.bakken; i++) {
+      var vertraging = i * 0.55;
+      var b = document.createElement('span');
+      b.className = 'bier';
+      b.style.setProperty('--d', vertraging + 's');
+      b.innerHTML = BIER_SVG + '<span class="straal"></span>';
+      bieren.appendChild(b);
+      var sp = document.createElement('span');
+      sp.className = 'spetter';
+      sp.style.setProperty('--d', (vertraging + 0.5) + 's');
+      sp.style.left = (8 + ((i * 37) % 82)) + '%';
+      sp.style.top = ((i * 53) % 65) + '%';
+      var g = 10 + ((i * 29) % 14);
+      sp.style.width = g + 'px';
+      sp.style.height = g + 'px';
+      spetters.appendChild(sp);
+    }
+
     var details = $('#end-details');
     details.innerHTML = '';
     game.results.forEach(function (r) {

@@ -2,7 +2,7 @@
    Verhoog CACHE_VERSIE bij elke update zodat nieuwe bestanden doorkomen. */
 'use strict';
 
-const CACHE_VERSIE = 'stb-cache-v4';
+const CACHE_VERSIE = 'stb-cache-v5';
 
 const BESTANDEN = [
   './',

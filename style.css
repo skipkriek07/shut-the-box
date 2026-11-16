@@ -488,19 +488,115 @@ body {
 .shootout-rolls li strong { color: var(--accent); font-size: 1.15rem; }
 
 /* ---------- Einde potje ---------- */
-.end-screen { text-align: center; gap: 8px; }
-.end-label { margin: 0; color: var(--tekst-dim); font-size: 1rem; }
+.end-screen { text-align: center; gap: 4px; padding: 4px 12px; justify-content: center; }
+.end-label { margin: 0; color: var(--tekst-dim); font-size: 0.95rem; }
+
+.end-naam-wrap { position: relative; }
 .end-loser {
   margin: 0;
-  font-size: clamp(2.2rem, 11vh, 4.5rem);
+  font-size: clamp(2rem, 10vh, 4rem);
   color: var(--gevaar);
   text-shadow: 0 3px 0 #000;
   overflow-wrap: anywhere;
+  line-height: 1.1;
 }
-.end-baks { margin: 0; font-size: clamp(1.2rem, 5vh, 2rem); font-weight: 700; color: var(--accent); }
-.end-details { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 6px 0; }
-.end-details .score-chip { font-size: 0.95rem; padding: 6px 16px; }
-.end-shuts { margin: 0; color: var(--tekst-dim); }
+
+/* bierspetters over de naam */
+#end-spetters { position: absolute; inset: -8px; pointer-events: none; }
+.spetter {
+  position: absolute;
+  border-radius: 50% 50% 45% 55%;
+  background: radial-gradient(circle at 35% 35%, #f6c569, var(--accent) 70%);
+  opacity: 0;
+  transform: scale(0.2);
+  animation: spet 0.7s ease-out forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes spet {
+  0% { opacity: 0; transform: scale(0.2) translateY(-8px); }
+  35% { opacity: 0.95; }
+  100% { opacity: 0; transform: scale(1.25) translateY(10px); }
+}
+
+/* rij biertjes boven de naam: elk glas kantelt en giet een straal over de naam */
+.end-bieren {
+  display: flex;
+  gap: clamp(6px, 1.6vw, 16px);
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0 14px;
+  margin: 0 0 -6px;
+  position: relative;
+  z-index: 2;
+}
+.bier {
+  position: relative;
+  display: inline-block;
+  width: clamp(30px, calc(62vw / var(--n, 1)), 58px);
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+}
+.bier svg { display: block; width: 100%; height: auto; overflow: visible; }
+.bier .glas-tilt {
+  transform-origin: 50% 90%;
+  animation: kantelen 1.2s ease-in-out forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes kantelen {
+  0%, 10% { transform: rotate(0deg); }
+  45%, 85% { transform: rotate(-68deg); }
+  100% { transform: rotate(-40deg); }
+}
+.bier .vocht {
+  transform-origin: 50% 100%;
+  animation: leeglopen 1.2s ease-in forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes leeglopen {
+  0%, 25% { transform: scaleY(1); }
+  85%, 100% { transform: scaleY(0.04); }
+}
+.bier .schuim {
+  animation: schuimWeg 1.2s ease-in forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes schuimWeg {
+  0%, 30% { opacity: 1; }
+  60%, 100% { opacity: 0; }
+}
+/* de gouden straal die naar beneden op de naam valt */
+.bier .straal {
+  position: absolute;
+  left: -52%;
+  top: 70%;
+  width: clamp(4px, 0.9vh, 7px);
+  height: clamp(44px, 15vh, 70px);
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(232,163,61,0.0), #e8a33d 25%, #f6c569);
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+  opacity: 0;
+  animation: stralen 1.2s ease-in-out forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes stralen {
+  0%, 25% { transform: scaleY(0); opacity: 0; }
+  40% { transform: scaleY(1); opacity: 1; }
+  80% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+.end-loser { animation: nat 0.5s ease-in-out 2; animation-delay: 0.6s; }
+@keyframes nat {
+  50% { text-shadow: 0 3px 0 #000, 0 0 18px rgba(232,163,61,0.9); color: #f0a95a; }
+}
+
+.end-baks { margin: 0; font-size: clamp(1.15rem, 4.5vh, 1.8rem); font-weight: 700; color: var(--accent); }
+.end-details { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 2px 0; }
+.end-details .score-chip { font-size: 0.9rem; padding: 4px 14px; }
+.end-shuts { margin: 0; color: var(--tekst-dim); font-size: 0.9rem; width: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bier .glas-tilt, .bier .vocht, .bier .schuim, .bier .straal, .spetter, .end-loser { animation: none !important; }
+}
 
 /* ---------- Scorebord ---------- */
 .table-wrap { width: 100%; max-width: 640px; overflow-x: auto; }
